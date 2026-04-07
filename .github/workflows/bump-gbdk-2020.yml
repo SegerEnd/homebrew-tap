@@ -9,30 +9,34 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: bump-gbdk-2020
+
 jobs:
   bump:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Update formula to latest upstream release
         run: |
-          python3 <<'PY'
-          import hashlib, json, re, urllib.request, pathlib
-          repo = "gbdk-2020/gbdk-2020"
-          v = json.loads(urllib.request.urlopen(f"https://api.github.com/repos/{repo}/releases/latest").read())["tag_name"]
-          assets = ["gbdk-macos.tar.gz", "gbdk-macos-arm64.tar.gz", "gbdk-linux64.tar.gz", "gbdk-linux-arm64.tar.gz"]
-          shas = {a: hashlib.sha256(urllib.request.urlopen(f"https://github.com/{repo}/releases/download/{v}/{a}").read()).hexdigest() for a in assets}
-          p = pathlib.Path("Formula/gbdk-2020.rb")
-          s = re.sub(r"releases/download/[0-9.]+/", f"releases/download/{v}/", p.read_text())
-          for a, sha in shas.items():
-              s = re.sub(rf'(url "[^"]*{re.escape(a)}"\s*\n\s*sha256 ")[0-9a-f]{{64}}', rf'\g<1>{sha}', s)
-          p.write_text(s)
-          print(f"::notice::gbdk-2020 set to {v}")
-          PY
+          set -euo pipefail
+          repo=gbdk-2020/gbdk-2020
+          formula=Formula/gbdk-2020.rb
+          version=$(gh release view --repo "$repo" --json tagName --jq .tagName)
+
+          sed -i -E "s|(version \")[^\"]+\"|\1${version}\"|;s|(releases/download/)[^/]+/|\1${version}/|g" "$formula"
+
+          for asset in gbdk-macos.tar.gz gbdk-macos-arm64.tar.gz gbdk-linux64.tar.gz gbdk-linux-arm64.tar.gz; do
+            sha=$(curl -fsSL "https://github.com/$repo/releases/download/$version/$asset" | sha256sum | cut -d' ' -f1)
+            sed -i -E "/${asset}\"$/{n;s|\"[0-9a-f]{64}\"|\"${sha}\"|;}" "$formula"
+          done
 
       - uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.BUMP_PAT || secrets.GITHUB_TOKEN }}
           commit-message: "gbdk-2020: auto-bump"
           title: "gbdk-2020: auto-bump"
           body: "Automated upstream version bump."
