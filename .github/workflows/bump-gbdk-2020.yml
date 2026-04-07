@@ -27,7 +27,7 @@ jobs:
           formula=Formula/gbdk-2020.rb
           version=$(gh release view --repo "$repo" --json tagName --jq .tagName)
 
-          sed -i -E "s|(version \")[^\"]+\"|\1${version}\"|;s|(releases/download/)[^/]+/|\1${version}/|g" "$formula"
+          sed -i -E "s|(releases/download/)[^/]+/|\1${version}/|g" "$formula"
 
           for asset in gbdk-macos.tar.gz gbdk-macos-arm64.tar.gz gbdk-linux64.tar.gz gbdk-linux-arm64.tar.gz; do
             sha=$(curl -fsSL "https://github.com/$repo/releases/download/$version/$asset" | sha256sum | cut -d' ' -f1)
