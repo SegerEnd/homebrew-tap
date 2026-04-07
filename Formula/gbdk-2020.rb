@@ -38,13 +38,13 @@ class Gbdk2020 < Formula
       bin.install_symlink tool
     end
 
-    # Patch template Makefiles to use the Homebrew install path.
-    # Skip Makefiles without a `GBDK = …` line (some upstream examples
-    # have a top-level Makefile that doesn't declare it).
+    # Patch example Makefiles so `cp -r .../template_minimal my-game && make`
+    # works out of the box. Upstream defaults `GBDK_HOME` to `../../../`,
+    # which only resolves correctly when building inside the gbdk source tree.
     Dir["#{libexec}/examples/**/Makefile"].each do |mf|
-      next unless File.read(mf).match?(/^\s*GBDK\s*=/)
+      next unless File.read(mf).include?("GBDK_HOME")
 
-      inreplace mf, /^(\s*GBDK\s*=\s*).*$/, "\\1#{opt_libexec}/"
+      inreplace mf, %r{^(\s*GBDK_HOME\s*=\s*)\.\./\.\./\.\./?$}, "\\1#{opt_libexec}"
     end
   end
 
@@ -57,7 +57,7 @@ class Gbdk2020 < Formula
   end
 
   test do
-    assert_match "lcc", shell_output("#{bin}/lcc 2>&1", 1)
+    assert_match "lcc [ option | file ]", shell_output("#{bin}/lcc 2>&1")
 
     cp_r "#{opt_libexec}/examples/gb/template_minimal/.", testpath
     system "make"
