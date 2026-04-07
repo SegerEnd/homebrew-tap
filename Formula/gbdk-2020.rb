@@ -1,6 +1,7 @@
 class Gbdk2020 < Formula
   desc "Cross-platform development kit for Game Boy, NES, SMS, and Game Gear"
   homepage "https://github.com/gbdk-2020/gbdk-2020"
+  version "4.4.0"
   license "GPL-2.0-only"
 
   livecheck do
@@ -37,11 +38,12 @@ class Gbdk2020 < Formula
       bin.install_symlink tool
     end
 
-    # Patch template Makefiles to use the Homebrew install path
+    # Patch template Makefiles to use the Homebrew install path.
+    # Skip Makefiles without a `GBDK = …` line (some upstream examples
+    # have a top-level Makefile that doesn't declare it).
     Dir["#{libexec}/examples/**/Makefile"].each do |mf|
+      next unless File.read(mf) =~ /^\s*GBDK\s*=/
       inreplace mf, /^(\s*GBDK\s*=\s*).*$/, "\\1#{opt_libexec}/"
-    rescue Utils::InreplaceError
-      next
     end
   end
 
