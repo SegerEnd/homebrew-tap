@@ -17,11 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Canonical github-actions[bot] identity (id 41898282) so the
-      # commit author/committer link to the bot account, not a human.
-      BOT_IDENTITY: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Update formula to latest upstream release
         id: bump
@@ -44,11 +41,9 @@ jobs:
             sed -i -E "/${asset}\"$/{n;s|\"[0-9a-f]{64}\"|\"${sha}\"|;}" "$formula"
           done
 
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.BUMP_PAT || secrets.GITHUB_TOKEN }}
-          author: ${{ env.BOT_IDENTITY }}
-          committer: ${{ env.BOT_IDENTITY }}
           commit-message: "gbdk-2020: ${{ steps.bump.outputs.current }} -> ${{ steps.bump.outputs.latest }}"
           title: "gbdk-2020: ${{ steps.bump.outputs.current }} -> ${{ steps.bump.outputs.latest }}"
           body: |
