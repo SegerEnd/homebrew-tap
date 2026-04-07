@@ -54,16 +54,10 @@ class Gbdk2020 < Formula
         cp -r #{opt_libexec}/examples/gb/template_minimal ./my-game
         cd my-game && make
 
-      Optional shell setup (if tools/scripts expect GBDK_HOME):
-        zsh:
-          grep -qxF 'export GBDK_HOME=#{opt_libexec}' ~/.zshrc || echo 'export GBDK_HOME=#{opt_libexec}' >> ~/.zshrc
-          grep -qxF 'export GBDK=#{opt_libexec}' ~/.zshrc || echo 'export GBDK=#{opt_libexec}' >> ~/.zshrc
-          source ~/.zshrc
-
-        bash:
-          grep -qxF 'export GBDK_HOME=#{opt_libexec}' ~/.bashrc || echo 'export GBDK_HOME=#{opt_libexec}' >> ~/.bashrc
-          grep -qxF 'export GBDK=#{opt_libexec}' ~/.bashrc || echo 'export GBDK=#{opt_libexec}' >> ~/.bashrc
-          source ~/.bashrc
+      To use GBDK-2020 with tools that expect environment variables,
+      add the following to your shell profile:
+        export GBDK=#{opt_libexec}
+        export GBDK_HOME=$GBDK
     EOS
   end
 
