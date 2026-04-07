@@ -42,7 +42,8 @@ class Gbdk2020 < Formula
     # Skip Makefiles without a `GBDK = …` line (some upstream examples
     # have a top-level Makefile that doesn't declare it).
     Dir["#{libexec}/examples/**/Makefile"].each do |mf|
-      next unless File.read(mf) =~ /^\s*GBDK\s*=/
+      next unless File.read(mf).match?(/^\s*GBDK\s*=/)
+
       inreplace mf, /^(\s*GBDK\s*=\s*).*$/, "\\1#{opt_libexec}/"
     end
   end
