@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        formula: [gbdk-2020, emulicious]
+        formula: [gbdk-2020, emulicious, aseprite]
     concurrency:
       group: bump-${{ matrix.formula }}
     env:
