@@ -30,10 +30,6 @@ class Emulicious < Formula
     # `brew upgrade` (which wipes the Cellar dir for the old version).
     (bin/"emulicious").write <<~EOS
       #!/bin/bash
-      set -e
-      SUPPORT="$HOME/Library/Application Support/Emulicious"
-      mkdir -p "$SUPPORT"
-      cd "$SUPPORT"
       exec "#{Formula["openjdk"].opt_bin}/java" -jar "#{libexec}/Emulicious.jar" "$@"
     EOS
     (bin/"emulicious").chmod 0755
@@ -44,12 +40,12 @@ class Emulicious < Formula
       Launch with:
         emulicious [path-to-rom.gb]
 
-      User settings and savestates are stored in:
-        ~/Library/Application Support/Emulicious/
-      `brew uninstall` does not remove this directory; delete it manually
-      for a complete cleanup.
+      Emulicious writes its settings (Emulicious.ini, savestates) next to
+      its jar, these will be reset on `brew upgrade emulicious`. Back up
+      #{opt_libexec}/Emulicious.ini if you want to preserve them.
 
-      For source-level C debugging from VS Code, install the extension.
+      For source-level C debugging from VS Code, install the
+      "Emulicious Debugger" extension (publisher: Calindro).
     EOS
   end
 
