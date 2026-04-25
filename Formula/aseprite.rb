@@ -43,7 +43,6 @@ class Aseprite < Formula
       -G Ninja
       -DCMAKE_BUILD_TYPE=RelWithDebInfo
       -DCMAKE_OSX_ARCHITECTURES=#{Hardware::CPU.arm? ? "arm64" : "x86_64"}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
       -DLAF_BACKEND=skia
       -DSKIA_DIR=#{skia_dir}
       -DSKIA_LIBRARY_DIR=#{skia_lib_dir}
@@ -58,14 +57,17 @@ class Aseprite < Formula
       system "ninja", "aseprite"
     end
 
-    # build/bin/ contains the aseprite binary plus its runtime data/
-    # (palettes, extensions, themes). They must stay together — Aseprite
-    # locates data/ relative to the binary.
-    libexec.install Dir["build/bin/*"]
+    # Aseprite's CMake builds a proper macOS .app bundle at
+    # build/bin/Aseprite.app/ (binary + data/ + Info.plist + icon).
+    # Install only the bundle — the bin/aseprite and bin/data symlinks
+    # CMake leaves alongside it would dangle once moved.
+    prefix.install "build/bin/Aseprite.app"
 
+    # CLI wrapper at bin/aseprite — runs the same binary inside the
+    # bundle, so `aseprite file.aseprite` works from the terminal.
     (bin/"aseprite").write <<~EOS
       #!/bin/bash
-      exec "#{libexec}/aseprite" "$@"
+      exec "#{opt_prefix}/Aseprite.app/Contents/MacOS/aseprite" "$@"
     EOS
     (bin/"aseprite").chmod 0755
   end
@@ -76,10 +78,14 @@ class Aseprite < Formula
       source is permitted by the EULA for personal use. If you use it in
       your work, please buy a license to support the project.
 
-      Launch with:
+      Launch from the terminal:
         aseprite [path-to-image.png|path-to.aseprite]
 
-      First build of this formula takes longer (mostly Skia-bound, C++ compilation).
+      To make Aseprite appear in /Applications, Spotlight, and Launchpad,
+      run once after install:
+        ln -s #{opt_prefix}/Aseprite.app /Applications/Aseprite.app
+
+      First build takes longer (mostly Skia-bound C++ compilation).
     EOS
   end
 
