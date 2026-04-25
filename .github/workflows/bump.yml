@@ -1,0 +1,39 @@
+name: Bump formulae
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        formula: [gbdk-2020, emulicious]
+    concurrency:
+      group: bump-${{ matrix.formula }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Bump ${{ matrix.formula }}
+        id: bump
+        run: ./.github/bumps/${{ matrix.formula }}.sh
+
+      - uses: peter-evans/create-pull-request@v8
+        if: steps.bump.outputs.changed == 'true'
+        with:
+          token: ${{ secrets.BUMP_PAT || secrets.GITHUB_TOKEN }}
+          commit-message: "${{ matrix.formula }}: ${{ steps.bump.outputs.current }} -> ${{ steps.bump.outputs.latest }}"
+          title: "${{ matrix.formula }}: ${{ steps.bump.outputs.current }} -> ${{ steps.bump.outputs.latest }}"
+          body: |
+            Automated upstream version bump from `${{ steps.bump.outputs.current }}` to `${{ steps.bump.outputs.latest }}`.
+          branch: bump/${{ matrix.formula }}
+          delete-branch: true
