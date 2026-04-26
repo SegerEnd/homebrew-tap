@@ -63,11 +63,11 @@ class Aseprite < Formula
     # CMake leaves alongside it would dangle once moved.
     prefix.install "build/bin/Aseprite.app"
 
-    # CLI wrapper at bin/aseprite — runs the same binary inside the
-    # bundle, so `aseprite file.aseprite` works from the terminal.
+    # CLI wrapper at bin/aseprite. Uses `open` so the terminal returns
+    # immediately, same as double-clicking the .app in Finder.
     (bin/"aseprite").write <<~EOS
       #!/bin/bash
-      exec "#{opt_prefix}/Aseprite.app/Contents/MacOS/aseprite" "$@"
+      exec open -a "#{opt_prefix}/Aseprite.app" --args "$@"
     EOS
     (bin/"aseprite").chmod 0755
   end
@@ -91,6 +91,7 @@ class Aseprite < Formula
 
   test do
     assert_predicate bin/"aseprite", :executable?
-    assert_match version.to_s, shell_output("#{bin}/aseprite --version 2>&1")
+    binary = prefix/"Aseprite.app/Contents/MacOS/aseprite"
+    assert_match version.to_s, shell_output("#{binary} --version 2>&1")
   end
 end
