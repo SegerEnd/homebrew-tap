@@ -1,8 +1,8 @@
 class Aseprite < Formula
   desc "Animated sprite editor and pixel art tool"
   homepage "https://www.aseprite.org/"
-  url "https://github.com/aseprite/aseprite/releases/download/v1.3.17.2/Aseprite-v1.3.17.2-Source.zip"
-  sha256 "3895afca60608e86ffbba20c32af95a6e59f8d7ebe6d2617236f159b42176bfe"
+  url "https://github.com/aseprite/aseprite/releases/download/v1.3.18.1/Aseprite-v1.3.18.1-Source.zip"
+  sha256 "438e7a1571990383beca761eca829402f14f225e164730eb2edc71b2e9566e58"
   # Aseprite ships under a custom EULA (not an OSI license).
   # Compiling for personal use is permitted; redistributing the binary is not.
   license :cannot_represent
