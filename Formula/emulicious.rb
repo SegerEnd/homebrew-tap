@@ -30,7 +30,7 @@ class Emulicious < Formula
     # `brew upgrade` (which wipes the Cellar dir for the old version).
     (bin/"emulicious").write <<~EOS
       #!/bin/bash
-      exec "#{Formula["openjdk"].opt_bin}/java" -jar "#{libexec}/Emulicious.jar" "$@"
+      exec "#{formula_opt_bin("openjdk")}/java" -jar "#{libexec}/Emulicious.jar" "$@"
     EOS
     (bin/"emulicious").chmod 0755
   end
