@@ -1,6 +1,6 @@
 cask "rbxbake" do
-  version "2026.10.03"
-  sha256 "d475e038c81d1a156284c70c16dbf938d812e91d56560c6ccd02a22a9f0322ba"
+  version "2026.10.04"
+  sha256 "b9093e6e81537a331f05fd37a4c36564ad4ec044e896ffd0796f0aeb12965a06"
 
   url "https://segerend.nl/rbxbake/cli.mjs?v=#{version}"
   name "rbxbake"
