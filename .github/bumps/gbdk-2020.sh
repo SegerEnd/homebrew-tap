@@ -7,7 +7,7 @@ formula=Formula/gbdk-2020.rb
 repo=gbdk-2020/gbdk-2020
 
 latest=$(gh release view --repo "$repo" --json tagName --jq .tagName)
-current=$(sed -n 's/^[[:space:]]*version "\([^"]*\)".*/\1/p' "$formula" | head -n1)
+current=$(sed -n 's|.*releases/download/\([^/]*\)/.*|\1|p' "$formula" | head -n1)
 
 {
   echo "current=$current"
@@ -19,7 +19,6 @@ if [ "$current" = "$latest" ]; then
   exit 0
 fi
 
-perl -i -pe "s|version \"\K[^\"]+(?=\")|${latest}|" "$formula"
 perl -i -pe "s|releases/download/\K[^/]+(?=/)|${latest}|g" "$formula"
 
 for asset in gbdk-macos.tar.gz gbdk-macos-arm64.tar.gz gbdk-linux64.tar.gz gbdk-linux-arm64.tar.gz; do
