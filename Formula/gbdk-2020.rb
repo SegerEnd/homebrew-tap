@@ -1,7 +1,6 @@
 class Gbdk2020 < Formula
   desc "Cross-platform development kit for Game Boy, NES, SMS, and Game Gear"
   homepage "https://github.com/gbdk-2020/gbdk-2020"
-  version "4.5.0"
   license "GPL-2.0-only"
 
   livecheck do
